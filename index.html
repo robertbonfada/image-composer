@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Canvas com Cartazes</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      height: 100vh;
+      gap: 10px;
+    }
+
+    .container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    canvas {
+      background-color: transparent;
+      border: 2px solid white;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      background-color: #28a745;
+      color: white;
+      border-radius: 5px;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <canvas id="posterCanvas" width="900" height="600"></canvas>
+    <button onclick="downloadCanvas('png')">Baixar PNG</button>
+    <button onclick="downloadCanvas('webp')">Baixar WebP</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("posterCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // Lista de URLs das imagens
+    const images = [
+      "https://picsum.photos/200/300?text=Filme1",
+      "https://picsum.photos/200/300?text=Filme2",
+      "https://picsum.photos/200/300?text=Filme3",
+      "https://picsum.photos/200/300?text=Filme4",
+      "https://picsum.photos/200/300?text=Filme5",
+      "https://picsum.photos/200/300?text=Filme6",
+      "https://picsum.photos/200/300?text=Filme7",
+      "https://picsum.photos/200/300?text=Filme8",
+      "https://picsum.photos/200/300?text=Filme9",
+      "https://picsum.photos/200/300?text=Filme10",
+      "https://picsum.photos/200/300?text=Filme11",
+      "https://picsum.photos/200/300?text=Filme12",
+      "https://picsum.photos/200/300?text=Filme9",
+      "https://picsum.photos/200/300?text=Filme10",
+    ];
+
+    const rows = 3;
+    const cols = 5;
+    const imgWidth = 200;
+    const imgHeight = 300;
+    const gapX = 10;
+    const gapY = 20;
+    const offsetX = 0;
+    const offsetY = -50;
+
+    function drawPosters() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.save();
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate(-5 * Math.PI / 180); // Rotação de -5 graus
+      ctx.translate(-canvas.width / 2, -canvas.height / 2);
+
+      let index = 0;
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          if (index >= images.length) return;
+          let img = new Image();
+          img.crossOrigin = "anonymous"; // fix for tainted canvas
+          img.src = images[index];
+          img.onload = function () {
+            let x = col * (imgWidth + gapX) + offsetX;
+            let y = row * (imgHeight + gapY) + offsetY;
+            ctx.drawImage(img, x, y, imgWidth, imgHeight);
+          };
+          index++;
+        }
+      }
+
+      ctx.restore();
+    }
+
+    function downloadCanvas(format) {
+      canvas.toBlob((blob) => {
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `cartazes.${format}`;
+        link.click();
+      }, `image/${format}`);
+    }
+
+    drawPosters();
+  </script>
+
+</body>
+
+</html>
