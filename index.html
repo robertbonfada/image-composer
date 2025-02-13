@@ -57,6 +57,9 @@
   <script>
     const canvas = document.getElementById("posterCanvas");
     const ctx = canvas.getContext("2d");
+    // Enable high quality image smoothing
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
 
     // Lista de URLs das imagens
     const images = [
@@ -85,6 +88,25 @@
     const offsetX = 0;
     const offsetY = -50;
 
+    function drawRoundedImage(image, x, y, width, height, radius) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.lineJoin = "round"; // improve smoothness at corners
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+      ctx.clip();
+      ctx.drawImage(image, x, y, width, height);
+      ctx.restore();
+    }
+
     function drawPosters() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.save();
@@ -102,7 +124,8 @@
           img.onload = function () {
             let x = col * (imgWidth + gapX) + offsetX;
             let y = row * (imgHeight + gapY) + offsetY;
-            ctx.drawImage(img, x, y, imgWidth, imgHeight);
+            // Use helper function with desired border radius (e.g., 20)
+            drawRoundedImage(img, x, y, imgWidth, imgHeight, 10);
           };
           index++;
         }
